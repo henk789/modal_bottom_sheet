@@ -605,6 +605,11 @@ class SheetState extends State<SheetScrollable>
   void _handleDragUpdate(DragUpdateDetails details) {
     // _drag might be null if the drag activity ended and called _disposeDrag.
     assert(_hold == null || _drag == null);
+    if (_hold == null && _drag == null) {
+      _drag = position.drag(
+          DragStartDetails(globalPosition: details.globalPosition),
+          _disposeDrag);
+    }
     _drag?.update(details);
   }
 
