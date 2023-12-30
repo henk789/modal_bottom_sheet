@@ -77,6 +77,7 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
 
   final SheetContext sheetContext;
   SheetPosition get sheetPosition => sheetContext.position;
+  bool _sheetDragged = false;
 
   bool sheetShouldSheetAcceptUserOffset(double delta) {
     // Can drag down if list already on the top
@@ -96,7 +97,8 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
     if (sheetPosition.preventingDrag) {
       return;
     }
-    if (sheetShouldSheetAcceptUserOffset(delta)) {
+    _sheetDragged = sheetShouldSheetAcceptUserOffset(delta);
+    if (_sheetDragged) {
       if (sheetPosition.activity is! _SheetScrollActivity) {
         sheetPosition.beginActivity(_SheetScrollActivity(sheetPosition));
       }
@@ -141,7 +143,7 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
             ),
             pixels,
             0,
-            velocity,
+            _sheetDragged ? 0 : velocity,
           ),
           context.vsync,
           true,
