@@ -124,7 +124,8 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
     }
 
     if (velocity > 0.0 &&
-            sheetPosition.pixels >= sheetPosition.maxScrollExtent ||
+            (sheetPosition.pixels >= sheetPosition.maxScrollExtent ||
+                pixels > 0) ||
         (velocity < 0.0 && pixels > 0)) {
       super.goBallistic(velocity);
       return;
