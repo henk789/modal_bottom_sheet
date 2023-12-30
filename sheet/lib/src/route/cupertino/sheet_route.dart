@@ -100,6 +100,7 @@ class CupertinoSheetRoute<T> extends SheetRoute<T> {
     Color? backgroundColor,
     super.maintainState = true,
     super.fit,
+    this.deviceRadius,
   }) : super(
           builder: (BuildContext context) {
             return _CupertinoSheetDecorationBuilder(
@@ -127,6 +128,8 @@ class CupertinoSheetRoute<T> extends SheetRoute<T> {
 
   @override
   bool get barrierDismissible => true;
+
+  final Radius? deviceRadius;
 
   @override
   Widget buildSheet(BuildContext context, Widget child) {
@@ -214,6 +217,7 @@ class CupertinoSheetRoute<T> extends SheetRoute<T> {
       body: child,
       sheetAnimation: delayAnimation,
       secondaryAnimation: secondaryAnimation,
+      deviceRadius: deviceRadius,
     );
   }
 }
@@ -226,12 +230,15 @@ class CupertinoSheetBottomRouteTransition extends StatelessWidget {
     required this.sheetAnimation,
     required this.secondaryAnimation,
     required this.body,
+    this.deviceRadius,
   });
 
   final Widget body;
 
   final Animation<double> sheetAnimation;
   final Animation<double> secondaryAnimation;
+
+  final Radius? deviceRadius;
 
   // Currently iOS does not provide any way to detect the radius of the
   // screen device. Right not we detect if the safe area has the size
@@ -249,7 +256,8 @@ class CupertinoSheetBottomRouteTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
     final double topOffset = math.max(_kSheetMinimalOffset, topPadding);
-    final Radius deviceCorner = _getRadiusForDevice(MediaQuery.of(context));
+    final Radius deviceCorner =
+        deviceRadius ?? _getRadiusForDevice(MediaQuery.of(context));
 
     final CurvedAnimation curvedAnimation = CurvedAnimation(
       parent: sheetAnimation,
