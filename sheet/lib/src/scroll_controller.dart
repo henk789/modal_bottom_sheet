@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:sheet/sheet.dart';
 
@@ -78,6 +80,7 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
   final SheetContext sheetContext;
   SheetPosition get sheetPosition => sheetContext.position;
   bool _sheetDragged = false;
+  double _activityMaxPixels = 0;
 
   bool sheetShouldSheetAcceptUserOffset(double delta) {
     // Can drag down if list already on the top
@@ -93,6 +96,12 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
   }
 
   @override
+  void beginActivity(ScrollActivity? newActivity) {
+    _activityMaxPixels = pixels;
+    super.beginActivity(newActivity);
+  }
+
+  @override
   void applyUserOffset(double delta) {
     if (sheetPosition.preventingDrag) {
       return;
@@ -105,12 +114,20 @@ class SheetPrimaryScrollPosition extends ScrollPositionWithSingleContext {
       final double sheetDelta =
           sheetPosition.physics.applyPhysicsToUserOffset(sheetPosition, delta);
       sheetPosition.applyUserOffset(sheetDelta);
+
+      // Prevent overscrolling of Scrollable when sheet is dragged down and
+      // Scrollable was previously scrolled
+      if (pixels < minScrollExtent && _activityMaxPixels > minScrollExtent) {
+        super.forcePixels(minScrollExtent);
+      }
+
       return;
     } else {
       super.applyUserOffset(delta);
       if (sheetPosition.activity is! HoldScrollActivity) {
         sheetPosition.hold(() {});
       }
+      _activityMaxPixels = max(_activityMaxPixels, pixels);
     }
   }
 
